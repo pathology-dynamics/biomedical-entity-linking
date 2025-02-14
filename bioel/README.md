@@ -1,8 +1,19 @@
 # BioEL: A comprehensive package for training, evaluating, and benchmarking biomedical entity linking models.
 
+## Citation
+
+If you have found our manuscript useful in your work, please consider citing:
+
+> @inproceedings{
+anonymous2025bioel,
+title={Bio{EL}: A Comprehensive Python Package for Biomedical Entity Linking},
+author={Anonymous},
+booktitle={The 2025 Annual Conference of the Nations of the Americas Chapter of the ACL},
+year={2025},
+url={https://openreview.net/forum?id=IzF83RNr3d}
+}
+
 ## Installation
-
-
 
 ```bash
 conda create -n bioel python=3.9
