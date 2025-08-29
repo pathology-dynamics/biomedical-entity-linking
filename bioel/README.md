@@ -4,13 +4,26 @@
 
 If you have found our manuscript useful in your work, please consider citing:
 
-> @inproceedings{
-anonymous2025bioel,
-title={Bio{EL}: A Comprehensive Python Package for Biomedical Entity Linking},
-author={Anonymous},
-booktitle={The 2025 Annual Conference of the Nations of the Americas Chapter of the ACL},
-year={2025},
-url={https://openreview.net/forum?id=IzF83RNr3d}
+> @inproceedings{bathala-etal-2025-bioel,
+    title = "{B}io{EL}: A Comprehensive Python Package for Biomedical Entity Linking",
+    author = "Bathala, Prasanth  and
+      Ye, Christophe  and
+      Nursal, Batuhan  and
+      Lohiya, Shubham  and
+      Kartchner, David  and
+      Mitchell, Cassie S.",
+    editor = "Chiruzzo, Luis  and
+      Ritter, Alan  and
+      Wang, Lu",
+    booktitle = "Findings of the Association for Computational Linguistics: NAACL 2025",
+    month = apr,
+    year = "2025",
+    address = "Albuquerque, New Mexico",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.findings-naacl.93/",
+    doi = "10.18653/v1/2025.findings-naacl.93",
+    pages = "1709--1721",
+    ISBN = "979-8-89176-195-7"
 }
 
 ## Installation
