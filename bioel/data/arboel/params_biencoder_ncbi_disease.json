@@ -5,7 +5,7 @@
     "ontology": "medic",
     "ontology_dict": {
         "name": "medic",
-        "filepath": "path to medic folder /medic.tsv"
+        "filepath": "path to medic.tsv"
     },
     "pos_neg_loss": true,
     "force_exact_search": true,
@@ -15,8 +15,8 @@
     "train_batch_size": 16,
     "gradient_accumulation_steps": 8,
     "knn": 10,
-    "experiment": "ncbi_disease_biencoder",
-    "path_to_abbrev": "data/abbreviations.json",
+    "experiment": "ncbi_disease",
+    "path_to_abbrev": "path to abbreviations.json",
     "recall_k": 64,
     "only_recall": true,
     "load_function": "load_medic",
