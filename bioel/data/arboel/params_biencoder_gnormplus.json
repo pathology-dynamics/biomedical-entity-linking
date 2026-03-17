@@ -5,11 +5,11 @@
     "ontology": "entrez",
     "ontology_dict": {
         "name": "entrez",
-        "filepath": "path to gene_info folder /gene_info.tsv",
+        "filepath": "path to gene_info.tsv",
         "dataset": "gnormplus"
     },
-    "tax2name_filepath": "path to tax2name file /tax2name.json",
-    "path_to_abbrev": "path to abbreviations file /abbreviations.json",
+    "tax2name_filepath": "path to tax2name.json",
+    "path_to_abbrev": "path to abbreviations.json",
     "pos_neg_loss": true,
     "force_exact_search": true,
     "embed_batch_size": 3500,

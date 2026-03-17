@@ -18,7 +18,7 @@
     "experiment": "bc5cdr",
     "bi_knn": 128,
     "recall_k": 128,
-    "path_to_abbrev": "path to abbreviations file / abbreviations.json",
+    "path_to_abbrev": "path to abbreviations.json",
     "load_function": "load_mesh",
     "limit_train_batches": 1.0,
     "limit_val_batches": 1.0,
