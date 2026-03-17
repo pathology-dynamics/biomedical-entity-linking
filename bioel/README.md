@@ -29,17 +29,15 @@ If you have found our manuscript useful in your work, please consider citing:
 ## Installation
 
 ```bash
-conda create -n bioel python=3.9
+conda create -n bioel python=3.10
 conda activate bioel
-pip install bioel
-
+pip install --editable ./
 python3 -m pip install pip==24.0
 
 git clone https://github.com/pytorch/fairseq
 cd fairseq
 pip install --editable ./
-
-pip install numpy==1.23
+pip install "numpy>=1.23.5,<2.0"
 ```
 
 Biobart and Biogenel require transformers version 4.44.2. This specific version of transformers depends on functionality available in numpy version 1.23.
@@ -63,6 +61,8 @@ Ontologies included in the package :
 (gene_info.gz)
 
 - MEDIC (MErged DIsease voCabulary) : It can be downloaded at https://ctdbase.org/downloads/
+
+- SNOMED-CT : It can be downloaded at https://www.nlm.nih.gov/healthit/snomedct/international.html
 
 ## Resolving abbreviations
 As a preprocessing step, we resolve abbreviations in the text using Ab3P, an abbreviation detector created for biomedical text. We ran abbreviation detection on the text of all documents in our benchmark, the results of which are stored in a large dictionary in `data/abbreviations.json`. In order to reproduce our abbreviation detection/resolution pipeline, please run the following:
@@ -125,6 +125,8 @@ evaluator.detailed_results()
 
 ## Config files
 Example of configuration files for the various models are provided in the `data/` directory. These can serve as references for users to create or modify their own configuration files.
+
+Additionally, all required files that appear in these condifurations files were also provided in the `data/` directory. This include : `abbreviations.json`, `cui_synsets.json` (for NCBI-Disease), `umls_cuis_st21pv.json` (for MedMentions-ST21PV) and `tax2name.json.zip` (for GNormPlus and NLMGene)
 
 ## Load the different datasets
 ```
