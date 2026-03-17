@@ -5,6 +5,7 @@ import pandas as pd
 
 from bioel.logger import setup_logger
 from bioel.utils.bigbio_utils import dataset_unique_tax_ids
+from bioel.utils.snomed_ct_it_utils import Snomed
 
 import obonet
 import csv
@@ -618,6 +619,46 @@ class BiomedicalOntology:
                 entities[concept["concept_id"]] = BiomedicalEntity(concept["concept_id"], concept["canonical_name"], concept["types"], concept["aliases"])
                 
         return cls(entities = entities, types = types, metadata = metadata, name = name)
+
+
+    @classmethod
+    def load_snomed_ct_it(cls, filepath, release_id = "20251101", name=None, abbrev=None, api_key=""): # Work with COMETA and AAP datasets
+        """
+        Read an ontology from the SNOMED CT Directory
+        
+        Parameters:
+        ----------------------
+            filepath: str (Pointing to the UMLS directory)
+            release_id: str (default to "20251101")
+            name: str (optional)
+            abbrev: str (optional)
+            api_key: str (optional)
+        """
+
+        entities = {}
+        types = []
+
+        logger.info(f"Reading SNOMED CT from : {filepath}")
+        snomed_path = filepath
+        snomed = Snomed(snomed_path=snomed_path, release_id=release_id)
+        snomed.load_snomed()
+
+        # Get the Canonial Names
+        for cui in snomed.index_concept : 
+            concept = snomed.index_concept[cui][0]
+            aliases = snomed.index_concept[cui][1:]
+            definition = snomed.index_definition.get(cui, None)
+            new_cui = "SNOMEDCT:" + cui
+            entity = BiomedicalEntity(
+                cui=new_cui,
+                name=concept,
+                aliases='|'.join(aliases) if aliases else '',
+                definition=definition,
+                types=None,
+            )
+            entities[new_cui] = entity
+
+        return cls(entities=entities, types=types, name=name, abbrev=abbrev)
 
     def load_ncbi_taxon(self):
         pass

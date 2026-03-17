@@ -15,7 +15,7 @@
     "recall_k": 128,
     "bi_knn": 128,
     "only_recall": true,
-    "path_to_abbrev": "path to abbreviations file / abbreviations.json",
+    "path_to_abbrev": "path to abbreviations.json",
     "limit_train_batches": 1.0,
     "limit_val_batches": 1.0,
     "limit_test_batches": 1.0,

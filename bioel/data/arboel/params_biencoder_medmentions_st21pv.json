@@ -1,0 +1,26 @@
+{
+    "data_path": "data/arboel/medmentions_st21pv",
+    "output_path": "results/arboel/medmentions_st21pv",
+    "dataset": "medmentions_st21pv",
+    "ontology": "umls",
+    "ontology_dict": {
+        "name": "umls",
+        "filepath": "path to umls folder",
+        "path_st21pv_cui": "path to umls_cuis_st21pv.json"
+    },
+    "pos_neg_loss": true,
+    "force_exact_search": true,
+    "embed_batch_size": 3500,
+    "model_name_or_path": "dmis-lab/biobert-base-cased-v1.2",
+    "num_train_epochs": 10,
+    "train_batch_size": 8,
+    "gradient_accumulation_steps": 8,
+    "experiment": "medmentions_st21pv",
+    "path_to_abbrev": "path to abbreviations.json",
+    "recall_k": 64,
+    "only_recall": true,
+    "load_function": "load_umls",
+    "devices": [
+        2
+    ]
+}

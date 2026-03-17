@@ -1,0 +1,23 @@
+{
+    "data_path": "data/arboel/medmentions_st21pv",
+    "output_path": "results/arboel/medmentions_st21pv",
+    "dataset": "medmentions_st21pv",
+    "model_name_or_path": "dmis-lab/biobert-base-cased-v1.2",
+    "biencoder_checkpoint": "path to biencoder checkpoint",
+    "learning_rate": 2e-05,
+    "num_train_epochs": 10,
+    "add_linear": true,
+    "train_batch_size": 2,
+    "eval_batch_size": 16,
+    "biencoder_indices_path": "data_test/arboel/medmentions_st21pv",
+    "experiment": "medmentions_st21pv_cross",
+    "recall_k": 64,
+    "only_recall": true,
+    "path_to_abbrev": "path to abbreviations.json",
+    "limit_train_batches": 1.0,
+    "limit_val_batches": 100,
+    "limit_test_batches": 1.0,
+    "devices": [
+        3
+    ]
+}
