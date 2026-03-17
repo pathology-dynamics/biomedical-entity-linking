@@ -1,0 +1,32 @@
+{
+    "data_path": "data/arboel/gnormplus",
+    "output_path": "results/arboel/gnormplus",
+    "dataset": "gnormplus",
+    "ontology": "entrez",
+    "ontology_dict": {
+        "name": "entrez",
+        "filepath": "path to gene_info folder /gene_info.tsv",
+        "dataset": "gnormplus"
+    },
+    "tax2name_filepath": "path to tax2name file /tax2name.json",
+    "path_to_abbrev": "path to abbreviations file /abbreviations.json",
+    "pos_neg_loss": true,
+    "force_exact_search": true,
+    "embed_batch_size": 3500,
+    "model_name_or_path": "dmis-lab/biobert-base-cased-v1.2",
+    "num_train_epochs": 12,
+    "train_batch_size": 16,
+    "gradient_accumulation_steps": 8,
+    "knn": 10,
+    "experiment": "gnormplus",
+    "recall_k": 128,
+    "load_function": "load_entrez",
+    "limit_train_batches": 1.0,
+    "limit_val_batches": 1.0,
+    "limit_test_batches": 1.0,
+    "save_topk_result": true,
+    "learning_rate": 3e-5,
+    "devices": [
+        0
+    ]
+}

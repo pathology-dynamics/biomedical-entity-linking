@@ -1,0 +1,30 @@
+{
+    "data_path": "data/arboel/ask_a_patient",
+    "output_path": "results/arboel/ask_a_patient/fold9",
+    "dataset": "ask_a_patient",
+    "ontology": "snomed_ct_it",
+    "ontology_dict": {
+        "name": "snomed_ct_it",
+        "filepath": "path to snomed_ct_it folder"
+    },
+    "model_name_or_path": "dmis-lab/biobert-base-cased-v1.2",
+    "biencoder_checkpoint": "path to biencoder checkpoint / .ckpt",
+    "learning_rate": 2e-05,
+    "num_train_epochs": 5,
+    "add_linear": true,
+    "train_batch_size": 2,
+    "eval_batch_size": 16,
+    "biencoder_indices_path": "data/arboel/ask_a_patient",
+    "experiment": "ask_a_patient_cross",
+    "recall_k": 128,
+    "bi_knn": 128,
+    "only_recall": true,
+    "path_to_abbrev": "path to abbreviations file / abbreviations.json",
+    "limit_train_batches": 1.0,
+    "limit_val_batches": 1.0,
+    "limit_test_batches": 1.0,
+    "fold_number": 9,
+    "devices": [
+        0
+    ]
+}

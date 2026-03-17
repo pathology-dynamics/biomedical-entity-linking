@@ -122,6 +122,7 @@ def evaluate_single_batch(
     mention_data=None,
     compute_macro_avg=False,
     store_failure_success=False,
+    fold_number=None,
 ):
     """
     Evaluate the performance of the crossencoder on a single batch of data.
@@ -183,7 +184,7 @@ def evaluate_single_batch(
     if store_failure_success:
 
         # Needed for the output for evaluation
-        data = load_bigbio_dataset(params["dataset"])
+        data = load_bigbio_dataset(params["dataset"], fold_number=fold_number)
         if params["path_to_abbrev"]:
             data_with_abbrev = add_deabbreviations(
                 dataset=data, path_to_abbrev=params["path_to_abbrev"]
@@ -335,6 +336,7 @@ class LitCrossEncoder(L.LightningModule):
             logger=logger,
             context_length=self.hparams["max_context_length"],
             params=self.hparams,
+            fold_number=self.hparams.get("fold_number"),
         )
 
         self.log(
@@ -386,6 +388,7 @@ class LitCrossEncoder(L.LightningModule):
             mention_data=self.trainer.datamodule.test_data,
             compute_macro_avg=True,
             store_failure_success=True,
+            fold_number=self.hparams.get("fold_number"),
         )
         self.test_results = merge_dicts(self.test_results, results)
 

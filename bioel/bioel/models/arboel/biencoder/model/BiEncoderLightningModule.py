@@ -300,6 +300,7 @@ def evaluate_test(
     context_doc_ids=None : bool
         This would be used in conjunction with within_doc to limit evaluations within the same document.
     """
+    print("Number of test mentions:", len(test_men_vecs))
 
     output_path = params["output_path"]
     if not os.path.exists(output_path):
@@ -331,16 +332,18 @@ def evaluate_test(
     dict_idx_to_cui = {v: k for k, v in dict_cui_to_idx.items()}
 
     # Needed for the output for evaluation
-    data = load_bigbio_dataset(params["dataset"])
+    data = load_bigbio_dataset(params["dataset"], fold_number=params.get("fold_number"))
+    exclude = CUIS_TO_EXCLUDE[params["dataset"]]
+    remap = CUIS_TO_REMAP[params["dataset"]]
     if params["path_to_abbrev"]:
         data_with_abbrev = add_deabbreviations(
             dataset=data, path_to_abbrev=params["path_to_abbrev"]
         )
-    exclude = CUIS_TO_EXCLUDE[params["dataset"]]
-    remap = CUIS_TO_REMAP[params["dataset"]]
-    df = dataset_to_df(
-        data_with_abbrev, entity_remapping_dict=remap, cuis_to_exclude=exclude
-    )
+        df = dataset_to_df(
+            data_with_abbrev, entity_remapping_dict=remap, cuis_to_exclude=exclude
+        )
+    else:
+        df = dataset_to_df(data, entity_remapping_dict=remap, cuis_to_exclude=exclude)
 
     # Output for evaluation object
     output_eval = []
@@ -598,9 +601,23 @@ def evaluate_test(
                 synsets = ujson.load(
                     open(os.path.join(params["data_path"], "cui_synsets.json"))
                 )
-                mention_dict["candidates"] = [
-                    synsets[y[0]] for y in mention_dict["candidates"]
-                ]
+                """
+                (A) expands the CUI IDs to include all equivalent CUIs in the candidate list.
+                However each new equivalent CUI is treated as a separate candidate in the evaluation (bioel/evaluate.py).
+                (B) Therefore it's just easier to consider all equivalent CUIs of the correct entity (given by column 'db_ids') and as long as a candidate match is found, it will be counted as a correct prediction.
+                After careful consideration, it's better to not add it here because other models (SapBERT, BioGenel etc...) have different logic.
+                I will just modify 'db_ids' directly in the evaluation script to consider equivalent CUIs.
+                """
+                ## (A)
+                # mention_dict["candidates"] = [
+                #     synsets[y[0]] for y in mention_dict["candidates"]
+                # ]
+
+                ## (B)
+                # expanded_db_ids = []
+                # for cui in mention_dict["db_ids"]:
+                #     expanded_db_ids.extend(synsets.get(cui, [cui]))
+                # mention_dict["db_ids"] = expanded_db_ids
 
             output_eval.append(mention_dict)
 
@@ -689,6 +706,16 @@ def evaluate_test(
         for recall_k in recall_accuracy:
             recall_accuracy[recall_k] /= len(nn_ent_idxs)
             logger.info(f"recall@{recall_k} = {recall_accuracy[recall_k]}")
+
+        # # Store results for evaluation object
+        # if params["save_topk_result"]:
+        #     base_filename = "biencoder_output_eval"
+        #     biencoder_output_eval = create_versioned_filename(
+        #         output_path, base_filename
+        #     )
+        #     with open(f"{biencoder_output_eval}", "w") as f:
+        #         json.dump(output_eval, f, indent=2)
+        #         print(f"\nPredictions overview saved at: {biencoder_output_eval}")
 
         if params["only_recall"]:
             return

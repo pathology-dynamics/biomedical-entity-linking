@@ -5,7 +5,7 @@
     "ontology": "medic",
     "ontology_dict": {
         "name": "medic",
-        "filepath": "/mitchell/entity-linking/kbs/medic.tsv"
+        "filepath": "path to medic folder /medic.tsv"
     },
     "pos_neg_loss": true,
     "force_exact_search": true,

@@ -164,7 +164,7 @@ class BlinkParser(argparse.ArgumentParser):
         parser.add_argument(
             "--add_linear",
             action="store_true",
-            help="Whether to add an additonal linear projection on top of the model.",
+            help="Whether to add an additonal linear projection on top of the model (for cross-encoder to generate a score).",
         )
         parser.add_argument(
             "--pickle_src_path",
@@ -496,13 +496,12 @@ class BlinkParser(argparse.ArgumentParser):
             type=int,
             help="Limit the number of training batches",
         )
-        
+
         parser.add_argument(
             "--path_st21pv_cui",
             type=str,
             help="Path to st21pv cuis subset for umls",
         )
-        
 
     def add_eval_args(self, args=None):
         """
@@ -578,13 +577,13 @@ class BlinkParser(argparse.ArgumentParser):
         parser.add_argument(
             "--recall_k",
             type=int,
-            default=16,
-            help="Number of kNN entity candidates to fetch to calculate the model's recall accuracy",
+            default=64,
+            help="Number of kNN entity candidates to fetch to calculate the model's recall@k score",
         )
         parser.add_argument(
             "--only_recall",
             action="store_true",
-            help="Whether to run evaluation to only compute the recall metric for recall@{--recall_k}",
+            help="Whether to run evaluation to only compute the recall metric for recall@{--recall_k}. If set to true, results.json will not be saved (candidates for each mention etc...).",
         )
         parser.add_argument(
             "--force_exact_search",
