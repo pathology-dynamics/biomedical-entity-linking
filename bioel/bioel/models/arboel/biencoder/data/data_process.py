@@ -250,8 +250,22 @@ def process_mention_data(
     # Tokenize entities from the entity dictionary if not already processed
     processed_samples = []
     dict_cui_to_idx = {}
+    cui_to_equivalent_cuis = {}
+
+    # Check if entities have equivalent CUIs
+    has_equivalent_cuis = False
+    if len(entity_dictionary) > 0 and "cuis" in entity_dictionary[0]:
+        has_equivalent_cuis = True
+        print("Entities have equivalent CUIs. Will handle them during processing.")
+
     for idx, ent in enumerate(tqdm(entity_dictionary, desc="Tokenizing dictionary")):
         dict_cui_to_idx[ent["cui"]] = idx
+
+        # Store equivalent CUIs mapping if available
+        if has_equivalent_cuis and "cuis" in ent:
+            for cui in ent["cuis"]:
+                cui_to_equivalent_cuis[cui] = ent["cuis"]
+
         if not dictionary_processed:
             label_representation = get_candidate_representation(
                 ent["description"], tokenizer, max_cand_length, ent["title"]
@@ -288,13 +302,32 @@ def process_mention_data(
         for l in labels:
             label = l[label_key]
             label_idx = l[label_id_key]
-            if label_idx not in dict_cui_to_idx:
-                not_found_in_dict = True
-                break
-            record_labels.append(dict_cui_to_idx[label_idx])
-            record_cuis.append(label_idx)
+
+            # Check if the label_idx is directly in the dictionary
+            if label_idx in dict_cui_to_idx:
+                record_labels.append(dict_cui_to_idx[label_idx])
+                record_cuis.append(label_idx)
+                continue
+
+            # If not found directly, check for equivalent CUIs if available
+            if has_equivalent_cuis and label_idx in cui_to_equivalent_cuis:
+                equivalent_found = False
+                for equiv_cui in cui_to_equivalent_cuis[label_idx]:
+                    if equiv_cui in dict_cui_to_idx:
+                        record_labels.append(dict_cui_to_idx[equiv_cui])
+                        record_cuis.append(equiv_cui)
+                        equivalent_found = True
+                        break
+
+                if equivalent_found:
+                    continue
+
+            # If we reach here, neither the CUI nor any equivalent CUI was found
+            not_found_in_dict = True
+            break
 
         if not_found_in_dict:
+            print(f"Sample not found in dictionary: {sample}")
             continue
 
         record = {
@@ -378,8 +411,22 @@ def process_mention_with_candidate(
     # Tokenize entities from the entity dictionary if not already processed
     processed_samples = []
     dict_cui_to_idx = {}
+    cui_to_equivalent_cuis = {}
+
+    # Check if entities have equivalent CUIs
+    has_equivalent_cuis = False
+    if len(entity_dictionary) > 0 and "cuis" in entity_dictionary[0]:
+        has_equivalent_cuis = True
+        print("Entities have equivalent CUIs. Will handle them during processing.")
+
     for idx, ent in enumerate(tqdm(entity_dictionary, desc="Tokenizing dictionary")):
         dict_cui_to_idx[ent["cui"]] = idx
+
+        # Store equivalent CUIs mapping if available
+        if has_equivalent_cuis and "cuis" in ent:
+            for cui in ent["cuis"]:
+                cui_to_equivalent_cuis[cui] = ent["cuis"]
+
         if not dictionary_processed:
             label_representation = get_candidate_representation(
                 ent["description"], tokenizer, max_cand_length, ent["title"]
@@ -436,11 +483,29 @@ def process_mention_with_candidate(
         for l in labels:
             label = l[label_key]
             label_idx = l[label_id_key]
-            if label_idx not in dict_cui_to_idx:
-                not_found_in_dict = True
-                break
-            record_labels.append(dict_cui_to_idx[label_idx])
-            record_cuis.append(label_idx)
+
+            # Check if the label_idx is directly in the dictionary
+            if label_idx in dict_cui_to_idx:
+                record_labels.append(dict_cui_to_idx[label_idx])
+                record_cuis.append(label_idx)
+                continue
+
+            # If not found directly, check for equivalent CUIs if available
+            if has_equivalent_cuis and label_idx in cui_to_equivalent_cuis:
+                equivalent_found = False
+                for equiv_cui in cui_to_equivalent_cuis[label_idx]:
+                    if equiv_cui in dict_cui_to_idx:
+                        record_labels.append(dict_cui_to_idx[equiv_cui])
+                        record_cuis.append(equiv_cui)
+                        equivalent_found = True
+                        break
+
+                if equivalent_found:
+                    continue
+
+            # If we reach here, neither the CUI nor any equivalent CUI was found
+            not_found_in_dict = True
+            break
 
         if not_found_in_dict:
             continue

@@ -25,7 +25,6 @@ from bioel.utils.bigbio_utils import (
 )
 from bioel.ontology import BiomedicalOntology
 
-
 def get_type_gcd(types, type2geneology, cached_types: dict = None):
     """
     Find the most granular single parent type for an entity with multiple types
@@ -101,7 +100,7 @@ def process_ontology(
     ontology_entities = []
     for cui, entity in tqdm(ontology.entities.items()):
         new_entity = {}
-
+        
         if ontology.name.lower() in ["umls"]:
             with open(os.path.join(data_path, "tui2type_hierarchy.json"), "r") as f:
                 type2geneology = ujson.load(f)
@@ -179,6 +178,7 @@ def process_mention_dataset(
     data_path: str,
     path_to_abbrev=None,
     tax2name_filepath=None,
+    fold_number=None,
 ):
     """
     This function prepares the mentions data :  Creates the train.jsonl, valid.jsonl, test.jsonl
@@ -191,7 +191,7 @@ def process_mention_dataset(
     'type': type
     'label_id': label_id,
     'label': entity description, (optional)
-    'label_title': entity title
+    'label_title': entity title}
 
     Parameters
     ----------
@@ -204,7 +204,7 @@ def process_mention_dataset(
     - tax2name_filepath : str
     Path to the taxonomy to name file
     """
-    data = load_bigbio_dataset(dataset_name=dataset)
+    data = load_bigbio_dataset(dataset_name=dataset, fold_number=fold_number)
     exclude = CUIS_TO_EXCLUDE[dataset]
     remap = CUIS_TO_REMAP[dataset]
 
@@ -241,11 +241,10 @@ def process_mention_dataset(
         val_split_ids=validation_pmids,
     )
     # Return dictionary of documents in BigBio dataset
-    docs = dataset_to_documents(data)
+    docs = dataset_to_documents(data, dataset_name=dataset)
     label_len = df["db_ids"].map(lambda x: len(x)).max()
     print("Max labels on one doc:", label_len)
-
-    abbrev_dict = ujson.load(open(path_to_abbrev))
+    abbrev_dict = ujson.load(open(path_to_abbrev)) if path_to_abbrev else None
 
     for split in df.split.unique():
         ents_in_split = []
@@ -313,6 +312,19 @@ def process_mention_dataset(
             ]
 
             if abbrev_resolved:
+                output = [
+                    {
+                        "mention": deabbreviated_mention,
+                        "mention_id": d["mention_id"] + ".abbr_resolved",
+                        "context_left": before_context,
+                        "context_right": after_context,
+                        "context_doc_id": doc_id,
+                        "type": d["type"][0],
+                        "label_id": label_id,
+                        "label": entity_dictionary[label_id]["description"],
+                        "label_title": entity_dictionary[label_id]["title"],
+                    }
+                ]
                 output.append(
                     {
                         "mention": deabbreviated_mention,
