@@ -61,13 +61,20 @@ def modify(context_input, candidate_input, max_seq_length):
 
 
 def prepare_data(params):
-    missing_files = any(
-        not os.path.exists(
-            os.path.join(
-                params["biencoder_indices_path"],
-                f"candidates_{data_split}_top64.t7",
+    bi_knn = params.get("bi_knn", 64)
+    candidate_roots = [params.get("biencoder_indices_path"), params.get("data_path")]
+    candidate_roots = [p for p in candidate_roots if p is not None]
+
+    def _candidate_exists(data_split):
+        return any(
+            os.path.exists(
+                os.path.join(root, f"candidates_{data_split}_top{bi_knn}.t7")
             )
+            for root in candidate_roots
         )
+
+    missing_files = any(
+        not _candidate_exists(data_split)
         for data_split in ["train", "valid", "test"]
     )
 
@@ -81,11 +88,7 @@ def prepare_data(params):
         reranker = MyModel.reranker
 
     for data_split in ["train", "valid", "test"]:
-        fname = os.path.join(
-            params["biencoder_indices_path"],
-            f"candidates_{data_split}_top64.t7",
-        )
-        if not os.path.exists(fname):
+        if not _candidate_exists(data_split):
             save_topk_biencoder_cands(
                 bi_reranker=reranker,
                 params=params,
@@ -93,7 +96,7 @@ def prepare_data(params):
                 bi_tokenizer=AutoTokenizer.from_pretrained(
                     params["model_name_or_path"]
                 ),
-                topk=64,
+                topk=bi_knn,
             )
 
 
@@ -204,15 +207,31 @@ def get_data_loader(
     return_data=False,
     custom_cand_set=None,
 ):
-    # Load the top-64 indices for each mention query and the ground truth label if it exists in the candidate set
+    # Load the top-k indices for each mention query and the ground truth label if it exists in the candidate set
+    bi_knn = params.get("bi_knn", 64)
     logger.info(f"Loading {data_split} data...")
     cand_name = data_split
     if custom_cand_set is not None:
         logger.info(f"Loading custom candidate set: {custom_cand_set}...")
         cand_name = custom_cand_set
-    fname = os.path.join(
-        params["biencoder_indices_path"], f"candidates_{cand_name}_top64.t7"
+    primary_fname = os.path.join(
+        params["biencoder_indices_path"], f"candidates_{cand_name}_top{bi_knn}.t7"
     )
+    fallback_fname = os.path.join(
+        params["data_path"], f"candidates_{cand_name}_top{bi_knn}.t7"
+    )
+    fname = primary_fname if os.path.exists(primary_fname) else fallback_fname
+    if not os.path.exists(fname):
+        logger.info(
+            "Missing %s. Building biencoder top-k candidate files now...", fname
+        )
+        prepare_data(params)
+        fname = primary_fname if os.path.exists(primary_fname) else fallback_fname
+    if not os.path.exists(fname):
+        raise FileNotFoundError(
+            f"Missing candidate file after preparation: {primary_fname} "
+            f"(fallback: {fallback_fname})"
+        )
     stored_data = torch.load(fname, weights_only=False)
     processed_data, entity_dictionary, tensor_data = load_data(
         data_split,
@@ -302,7 +321,7 @@ class CrossEncoderDataModule(L.LightningDataModule):
         )
 
     def prepare_data(self):
-        pass
+        prepare_data(self.hparams)
 
     def setup(self, stage=None):
         """
